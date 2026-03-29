@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBA Game Predictor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        .result {
+            display: none;
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 10px;
+            border-left: 5px solid #2a5298;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .winner {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #1e3c72;
+            margin: 15px 0;
+        }
+
+        .probability {
+            font-size: 1.2em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏀 NBA Game Predictor</h1>
+            <p>Predict winners using AI</p>
+        </header>
+
+        <div class="card">
+            <h2>Enter Matchup</h2>
+            
+            <div class="input-group">
+                <label>Home Team:</label>
+                <input type="text" id="homeTeam" placeholder="e.g., Lakers">
+            </div>
+
+            <div class="input-group">
+                <label>Away Team:</label>
+                <input type="text" id="awayTeam" placeholder="e.g., Celtics">
+            </div>
+
+            <button onclick="predictGame()">Predict Winner</button>
+
+            <div id="result" class="result">
+                <h3>Prediction:</h3>
+                <div class="winner" id="winner"></div>
+                <div class="probability" id="probability"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function predictGame() {
+            const homeTeam = document.getElementById('homeTeam').value;
+            const awayTeam = document.getElementById('awayTeam').value;
+
+            if (!homeTeam || !awayTeam) {
+                alert('Please enter both teams');
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/predict?home_team=${homeTeam}&away_team=${awayTeam}`, {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                    return;
+                }
+
+                document.getElementById('winner').textContent = `🏆 ${data.predicted_winner}`;
+                document.getElementById('probability').textContent = 
+                    `${data.home_team}: ${data.home_win_probability}% | ${data.away_team}: ${data.away_win_probability}%`;
+                
+                document.getElementById('result').classList.add('show');
+            } catch (error) {
+                alert('Error connecting to API: ' + error);
+            }
+        }
+    </script>
+</body>
+</html>
