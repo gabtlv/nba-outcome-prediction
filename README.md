@@ -115,8 +115,6 @@ The app will open at `http://localhost:3000`
 
 ## Screenshots
 
-*Coming soon*
-
 ## Contributing
 
 Pull requests welcome! For major changes, please open an issue first.
